@@ -30,9 +30,33 @@ namespace MoodJournal.Controllers
         public ActionResult Create()
         {
             MoodJournal.User user = new MoodJournal.User();
-            user.Save();
+            user.Save(true);
             return Json(user);
         }
+
+        [HttpPut("{id}")]
+        public ActionResult Edit(Guid id, [FromBody] User thisUser)
+        {
+            MoodJournal.User dbUser = MoodJournal.User.GetItem(id);
+            if (dbUser != null)
+            {
+                dbUser.UpdateFromObject(thisUser);
+                if (dbUser.Save())
+                { 
+                    return Ok(dbUser);
+                }
+                else
+                {
+                    return BadRequest("Error Saving");
+                }
+            }
+            else
+            {
+                return BadRequest("User Not Found");
+            }
+
+        }
+
 
         [HttpDelete("{id}")]
         public ActionResult Delete(Guid ID)

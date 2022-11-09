@@ -5,7 +5,8 @@ namespace MoodJournal.Models
 {
     public class Object<T> : System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
     {
-        private string SqlTable { get; set; }
+        private Attributes.SqlTable SqlTableAttr { get; set; }
+        private List<PropertyInfo> _editableProperties { get; set; }
 
         public event PropertyChangingEventHandler? PropertyChanging;
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -29,6 +30,16 @@ namespace MoodJournal.Models
             if (_ID == null || _ID == Guid.Empty) this._ID = Guid.NewGuid();
             if(DateCreated == null) DateCreated = DateTime.UtcNow;
             if(DateModified == null)DateModified = DateCreated;
+            SqlTableAttr = GetSqlTableAttr(typeof(T));
+            _editableProperties = GetSqlProperties(typeof(T)).Values.ToList();
+        }
+
+        public void UpdateFromObject(T ObjectIn)
+        {
+            foreach (PropertyInfo prop in _editableProperties)
+            {
+                prop.SetValue(this, prop.GetValue(ObjectIn));
+            }
         }
 
         public static T GetItem(Guid ID)
@@ -90,12 +101,11 @@ namespace MoodJournal.Models
         public T Get(Guid thisID)
         {
             Type thisType = typeof(T);
-            Attributes.SqlTable attr = GetSqlTableAttr(thisType);
             Dictionary<string, PropertyInfo> SqlColumns = GetSqlProperties(thisType);
 
-            if (attr != null)
+            if (SqlTableAttr != null)
             {
-                string query = $"EXEC {attr.GetSP} '{thisID}'";
+                string query = $"EXEC {SqlTableAttr.GetSP} '{thisID}'";
 
                 System.Data.SqlClient.SqlCommand cmd = new System.Data.SqlClient.SqlCommand(query, Server.DataSource.Connection);
                 System.Data.DataTable data = Server.DataSource.Read(cmd);
@@ -127,12 +137,9 @@ namespace MoodJournal.Models
 
         public bool Delete()
         {
-            Type thisType = GetType();
-            Attributes.SqlTable attr = GetSqlTableAttr(thisType);
-
-            if (attr != null)
+            if (SqlTableAttr != null)
             {
-                string query = $"EXEC {attr.DeleteSP} '{ID}'";
+                string query = $"EXEC {SqlTableAttr.DeleteSP} '{ID}'";
 
                 System.Data.SqlClient.SqlCommand cmd = new System.Data.SqlClient.SqlCommand(query, Server.DataSource.Connection);
                 return Server.DataSource.ExecuteQuery(cmd);
@@ -143,9 +150,26 @@ namespace MoodJournal.Models
             }
         }
 
-        public bool Save()
+        public bool Save(bool IsNew = false)
         {
-            return true;
+            if (SqlTableAttr != null)
+            {
+                if (IsNew)
+                {
+                    string query = $"EXEC {SqlTableAttr.InsertSP} ";
+                }
+                else
+                {
+                    string query = $"EXEC {SqlTableAttr.UpdateSP} ";
+                }
+
+                System.Data.SqlClient.SqlCommand cmd = new System.Data.SqlClient.SqlCommand(query, Server.DataSource.Connection);
+                return Server.DataSource.ExecuteQuery(cmd);
+            }
+            else
+            {
+                return false;
+            }
         }
 
 
