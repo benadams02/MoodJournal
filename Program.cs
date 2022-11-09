@@ -7,8 +7,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-MoodJournal.Server.Load();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -24,4 +22,9 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+MoodJournal.Server.Load();
+Console.WriteLine("MoodJournal Server Loaded");
+
 app.Run();
+
+

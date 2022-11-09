@@ -1,6 +1,6 @@
 ﻿namespace MoodJournal
 {
-    public partial class User : Models.Object
+    public partial class User : Models.Object<User>
     {
         [MoodJournal.Attributes.SqlColumn("UserName",true)]
         public string? UserName { get; set; }
@@ -27,4 +27,7 @@
         public const string Female = "Female";
         public const string Other = "Other";
     }
+
+
+    
 }

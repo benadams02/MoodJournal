@@ -1,6 +1,6 @@
 ﻿namespace MoodJournal
 {
-    public partial class Journal : Models.Object
+    public partial class Journal : Models.Object<Journal>
     {
         private Guid _User_UserID;
 
@@ -11,7 +11,7 @@
             set
             {
                 _User_UserID = value;
-                User = MoodJournal.User.Get(User_UserID);
+                User = (MoodJournal.User)new MoodJournal.User().Get(User_UserID);
             }
         }
         public MoodJournal.User User { get; set; }

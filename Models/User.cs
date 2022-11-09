@@ -8,24 +8,13 @@
             
         }
 
-        public static User Get(Guid ID)
-        {
-            if (ID != null)
-            {
-                User user = new User();
-                user = (MoodJournal.User)Models.Object.Get(typeof(MoodJournal.User), ID);
-                //Logic
-                return user;
-            }
-            else
-            {
-                return null;
-            }
-        }
+        
 
-        public bool Save()
+        public static List<MoodJournal.User> GetAllUsers()
         {
-            return base.Save(this.GetType());
+            List<MoodJournal.User> users = MoodJournal.User.Get();
+
+            return users;
         }
     }
 }

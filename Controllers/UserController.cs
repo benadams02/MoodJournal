@@ -12,12 +12,18 @@ namespace MoodJournal.Controllers
         {
             if(id != null && id != Guid.Empty)
             {
-                return Json(MoodJournal.User.Get(id));
+                return Json(MoodJournal.User.GetItem(id));
             }
             else
             {
                 return BadRequest("Invalid ID");
             }
+        }
+
+        [HttpGet()]
+        public ActionResult GetAll()
+        {
+            return Json(MoodJournal.User.GetAllUsers());
         }
 
         [HttpPost("Create")]
@@ -27,5 +33,26 @@ namespace MoodJournal.Controllers
             user.Save();
             return Json(user);
         }
+
+        [HttpDelete("{id}")]
+        public ActionResult Delete(Guid ID)
+        {
+            MoodJournal.User user = MoodJournal.User.GetItem(ID);
+            if(user.Delete())
+            {
+                return Ok("User Deleted");
+            }
+            else
+            {
+                return BadRequest("Error Deleting User");
+            }
+
+        }
+
+        //[HttpPut]
+        //public ActionResult Update([FromBody] MoodJournal.User user)
+        //{
+        //    user.Save();
+        //}
     }
 }

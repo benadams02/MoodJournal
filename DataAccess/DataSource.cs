@@ -1,4 +1,5 @@
-﻿using System.Data.Sql;
+﻿using System.Data;
+using System.Data.Sql;
 using System.Data.SqlClient;
 
 namespace MoodJournal
@@ -7,7 +8,7 @@ namespace MoodJournal
     {
         public SqlConnection Connection;
 
-        public SqlConnection LoadConnection()
+        public void LoadConnection()
         {
             SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
 
@@ -25,10 +26,9 @@ namespace MoodJournal
                 if (thisConn.State == System.Data.ConnectionState.Open)
                 {
                     thisConn.Close();
-                    return thisConn;
+                    Connection = thisConn;
                 }
             }
-            return thisConn;
         }
 
         public bool ExecuteQuery(SqlCommand command)
@@ -52,8 +52,9 @@ namespace MoodJournal
             }
         }
 
-        public SqlDataReader Read(SqlCommand command)
+        public DataTable Read(SqlCommand command)
         {
+            Dictionary<string, object> SqlObject = new Dictionary<string, object>();
             if (Connection.State == System.Data.ConnectionState.Closed)
             {
                 Connection.Open();
@@ -64,8 +65,11 @@ namespace MoodJournal
             {
                 command.Connection = Connection;
                 SqlDataReader data = command.ExecuteReader();
+                DataTable dt = new DataTable();
+                dt.Load(data);
+                data.Close();
                 Connection.Close();
-                return data;
+                return dt;
             }
             else
             {
