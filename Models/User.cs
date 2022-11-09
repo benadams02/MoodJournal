@@ -12,9 +12,7 @@
 
         public static List<MoodJournal.User> GetAllUsers()
         {
-            List<MoodJournal.User> users = MoodJournal.User.Get();
-
-            return users;
+            return MoodJournal.User.Get();
         }
     }
 }

@@ -70,7 +70,7 @@ namespace MoodJournal.Models
             {
                 SqlCommand cmd = new SqlCommand(attr.GetSP, Server.DataSource.Connection);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.Add(new SqlParameter("@ID", null));
+                cmd.Parameters.Add(new SqlParameter("@ID", DBNull.Value));
                 System.Data.DataTable data = Server.DataSource.Read(cmd);
 
                 if (data != null && data.Rows.Count > 0)
