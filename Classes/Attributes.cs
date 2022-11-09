@@ -7,11 +7,13 @@
         {
             private bool inSql;
             private string fieldName;
+            private System.Data.SqlDbType sqlDbType;
 
-            public SqlColumn(string FieldName, bool InSql)
+            public SqlColumn(string FieldName, bool InSql, System.Data.SqlDbType SqlDbType)
             { 
                 this.FieldName = FieldName;
                 this.InSql = InSql;
+                this.SqlDbType = SqlDbType;
             }
 
             public bool InSql
@@ -24,6 +26,12 @@
             {
                 get { return fieldName; }
                 set { fieldName = value; }
+            }
+
+            public System.Data.SqlDbType SqlDbType
+            {
+                get { return sqlDbType; }
+                set { sqlDbType = value; }
             }
         }
 

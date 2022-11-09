@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Reflection;
+using System.Data;
 
 namespace MoodJournal.Models
 {
@@ -11,14 +12,14 @@ namespace MoodJournal.Models
         public event PropertyChangingEventHandler? PropertyChanging;
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        [MoodJournal.Attributes.SqlColumn("DateCreated", true)]
+        [MoodJournal.Attributes.SqlColumn("DateCreated", true, SqlDbType.DateTime)]
         public DateTime? DateCreated { get; set; }
 
-        [MoodJournal.Attributes.SqlColumn("DateModified", true)]
+        [MoodJournal.Attributes.SqlColumn("DateModified", true, SqlDbType.DateTime)]
         public DateTime? DateModified { get; set; }
         private Guid _ID;
 
-        [MoodJournal.Attributes.SqlColumn("ID", true)]
+        [MoodJournal.Attributes.SqlColumn("ID", true, SqlDbType.UniqueIdentifier)]
         public Guid ID
         {
             get { return _ID; }
@@ -62,7 +63,7 @@ namespace MoodJournal.Models
             List<T> objects = new List<T>();
             Type thisType = typeof(T);
             Attributes.SqlTable attr = GetSqlTableAttr(thisType);
-            Dictionary<string, PropertyInfo> SqlColumns = GetSqlProperties(thisType);
+            Dictionary<Attributes.SqlColumn, PropertyInfo> SqlColumns = GetSqlProperties(thisType);
 
             if (attr != null)
             {
@@ -77,12 +78,12 @@ namespace MoodJournal.Models
                     {
                         var obj = Activator.CreateInstance(thisType);
 
-                        foreach (KeyValuePair<string, PropertyInfo> kvp in SqlColumns)
+                        foreach (KeyValuePair<Attributes.SqlColumn, PropertyInfo> kvp in SqlColumns)
                         {
                             var prop = kvp.Value;
                             var column = kvp.Key;
-                            if (row[column] != DBNull.Value)
-                                prop.SetValue(obj, row[column]);
+                            if (row[column.FieldName] != DBNull.Value)
+                                prop.SetValue(obj, row[column.FieldName]);
 
                         }
                         if (obj != null)
@@ -101,7 +102,7 @@ namespace MoodJournal.Models
         public T Get(Guid thisID)
         {
             Type thisType = typeof(T);
-            Dictionary<string, PropertyInfo> SqlColumns = GetSqlProperties(thisType);
+            Dictionary<Attributes.SqlColumn, PropertyInfo> SqlColumns = GetSqlProperties(thisType);
 
             if (SqlTableAttr != null)
             {
@@ -115,12 +116,12 @@ namespace MoodJournal.Models
                     var obj = Activator.CreateInstance(thisType);
                     var row = data.Rows[0];
 
-                    foreach (KeyValuePair<string, PropertyInfo> kvp in SqlColumns)
+                    foreach (KeyValuePair<Attributes.SqlColumn, PropertyInfo> kvp in SqlColumns)
                     {
                         var prop = kvp.Value;
                         var column = kvp.Key;
-                        if (row[column] != DBNull.Value)
-                            prop.SetValue(obj, row[column]);
+                        if (row[column.FieldName] != DBNull.Value)
+                            prop.SetValue(obj, row[column.FieldName]);
 
                     }
                     return (T)obj;
@@ -154,16 +155,28 @@ namespace MoodJournal.Models
         {
             if (SqlTableAttr != null)
             {
+                string query = "";
                 if (IsNew)
                 {
-                    string query = $"EXEC {SqlTableAttr.InsertSP} ";
+                    query = $"{SqlTableAttr.InsertSP}";
                 }
                 else
                 {
-                    string query = $"EXEC {SqlTableAttr.UpdateSP} ";
+                    query = $"{SqlTableAttr.UpdateSP}";
                 }
 
                 System.Data.SqlClient.SqlCommand cmd = new System.Data.SqlClient.SqlCommand(query, Server.DataSource.Connection);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                foreach (KeyValuePair<Attributes.SqlColumn, PropertyInfo> item in GetSqlProperties(typeof(T)))
+                {
+                    var value = item.Value.GetValue(this);
+                    if (value == null) value = DBNull.Value;
+                    //if (item.Key.SqlDbType == SqlDbType.UniqueIdentifier) value = $"'{value}'";
+                    var param = new System.Data.SqlClient.SqlParameter($"@{item.Key.FieldName}", value);
+                    param.SqlDbType = item.Key.SqlDbType;
+                    cmd.Parameters.Add(param);
+                }
+                
                 return Server.DataSource.ExecuteQuery(cmd);
             }
             else
@@ -186,15 +199,15 @@ namespace MoodJournal.Models
             }
         }
 
-        private static Dictionary<string, PropertyInfo> GetSqlProperties(Type type)
+        private static Dictionary<Attributes.SqlColumn, PropertyInfo> GetSqlProperties(Type type)
         {
-            Dictionary<string, PropertyInfo> SqlColumns = new Dictionary<string, PropertyInfo>();
+            Dictionary<Attributes.SqlColumn, PropertyInfo> SqlColumns = new Dictionary<Attributes.SqlColumn, PropertyInfo>();
             var props = type.GetProperties();
 
             foreach (var prop in props)
             {
                 var attr = (prop.GetCustomAttribute(typeof(Attributes.SqlColumn), true) as Attributes.SqlColumn);
-                if (attr != null) SqlColumns.Add(attr.FieldName, prop);
+                if (attr != null) SqlColumns.Add(attr, prop);
 
             }
             return SqlColumns;
