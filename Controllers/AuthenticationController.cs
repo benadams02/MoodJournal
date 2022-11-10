@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MoodJournal.Controllers
 {
-    [Route("api/Authenticate")]
+    [Route("api/Authenticate"),Authorize]
     public class AuthenticationController : Controller
     {
         public class AuthenticationRequest
@@ -24,7 +25,7 @@ namespace MoodJournal.Controllers
             return View();
         }
 
-        [HttpPost]
+        [HttpPost, AllowAnonymous]
         public ActionResult Authenticate([FromBody] AuthenticationRequest authreq)
         {
             if (!string.IsNullOrEmpty(authreq.username) && !string.IsNullOrEmpty(authreq.password))

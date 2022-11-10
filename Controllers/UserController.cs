@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MoodJournal.Controllers
 {   
-    [Route("api/User")]
+    [Route("api/User"), Authorize]
     public class UserController : Controller
     {
         // GET: UserController
