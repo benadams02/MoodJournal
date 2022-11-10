@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace MoodJournal.Controllers
 {
@@ -35,11 +39,9 @@ namespace MoodJournal.Controllers
                 {
                     if(thisUser.UserName == authreq.username && thisUser.Password == authreq.password)
                     {
-                        //generate token
-
                         AuthenticationResponse response = new AuthenticationResponse();
                         response.username = thisUser.UserName;
-                        response.token = "token";
+                        response.token = GenerateToken(thisUser);
                         return Json(response);
 
                     }
@@ -57,6 +59,27 @@ namespace MoodJournal.Controllers
             {
                 return BadRequest("Invalid Username or Password");
             }
+        }
+
+        private string GenerateToken(MoodJournal.User thisUser)
+        {
+            List<Claim> Claims = new List<Claim>
+                        {
+                            new Claim(ClaimTypes.Name, thisUser.UserName),
+                            new Claim(ClaimTypes.NameIdentifier, thisUser.ID.ToString()),
+                            new Claim(ClaimTypes.Expiration, DateTime.Now.AddDays(14).ToString())
+                        };
+
+            JwtSecurityTokenHandler jwtTokenHandler = new JwtSecurityTokenHandler();
+
+            var token = new JwtSecurityToken(
+                new JwtHeader(
+                    new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes("key12345key12345")),
+                    SecurityAlgorithms.HmacSha256)),
+                    new JwtPayload(Claims));
+
+            var returnToken = jwtTokenHandler.WriteToken(token);
+            return returnToken;
         }
     }
 }
