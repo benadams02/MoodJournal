@@ -174,6 +174,7 @@ namespace MoodJournal.Models
                     if (value == null) value = DBNull.Value;
                     var param = new System.Data.SqlClient.SqlParameter($"@{item.Key.FieldName}", value);
                     param.SqlDbType = item.Key.SqlDbType;
+                    param.Size = item.Key.MaxFieldSize;
                     cmd.Parameters.Add(param);
                 }
                 

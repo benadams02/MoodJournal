@@ -8,18 +8,25 @@
             private bool inSql;
             private string fieldName;
             private System.Data.SqlDbType sqlDbType;
+            private int maxFieldSize;
 
-            public SqlColumn(string FieldName, bool InSql, System.Data.SqlDbType SqlDbType)
+            public SqlColumn(string FieldName, bool InSql, System.Data.SqlDbType SqlDbType, int MaxFieldSize = 999)
             { 
                 this.FieldName = FieldName;
                 this.InSql = InSql;
                 this.SqlDbType = SqlDbType;
+                this.maxFieldSize = MaxFieldSize;
             }
 
             public bool InSql
             {
                 get { return inSql; }
                 set { inSql = value; }
+            }
+            public int MaxFieldSize
+            {
+                get { return maxFieldSize; }
+                set { maxFieldSize = value; }
             }
 
             public string FieldName
