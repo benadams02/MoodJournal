@@ -24,14 +24,38 @@ namespace MoodJournal.Controllers
             return View();
         }
 
+        [HttpPost]
         public ActionResult Authenticate([FromBody] AuthenticationRequest authreq)
         {
+            if (!string.IsNullOrEmpty(authreq.username) && !string.IsNullOrEmpty(authreq.password))
+            {
+                MoodJournal.User thisUser =  MoodJournal.User.GetByUsername(authreq.username);
+                if (thisUser != null)
+                {
+                    if(thisUser.UserName == authreq.username && thisUser.Password == authreq.password)
+                    {
+                        //generate token
 
-            AuthenticationResponse response = new AuthenticationResponse();
-            //Business Logic
-            JsonResult result = new JsonResult(response);
+                        AuthenticationResponse response = new AuthenticationResponse();
+                        response.username = thisUser.UserName;
+                        response.token = "token";
+                        return Json(response);
 
-            return result;
+                    }
+                    else
+                    {
+                        return BadRequest("Invalid Password");
+                    }
+                }
+                else
+                {
+                    return NotFound("User Not Found");
+                }
+            }
+            else
+            {
+                return BadRequest("Invalid Username or Password");
+            }
         }
     }
 }

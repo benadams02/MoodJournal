@@ -7,8 +7,8 @@ namespace MoodJournal.Models
 {
     public class Object<T> : System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
     {
-        private Attributes.SqlTable SqlTableAttr { get; set; }
-        private List<PropertyInfo> _editableProperties { get; set; }
+        protected Attributes.SqlTable SqlTableAttr { get; set; }
+        protected List<PropertyInfo> _editableProperties { get; set; }
 
         public event PropertyChangingEventHandler? PropertyChanging;
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -187,7 +187,7 @@ namespace MoodJournal.Models
         }
 
 
-        private static Attributes.SqlTable GetSqlTableAttr(Type type)
+        protected static Attributes.SqlTable GetSqlTableAttr(Type type)
         {
             var attr = type.GetCustomAttributes(typeof(Attributes.SqlTable), true).FirstOrDefault() as Attributes.SqlTable;
             if (attr != null)
@@ -200,7 +200,7 @@ namespace MoodJournal.Models
             }
         }
 
-        private static Dictionary<Attributes.SqlColumn, PropertyInfo> GetSqlProperties(Type type)
+        protected static Dictionary<Attributes.SqlColumn, PropertyInfo> GetSqlProperties(Type type)
         {
             Dictionary<Attributes.SqlColumn, PropertyInfo> SqlColumns = new Dictionary<Attributes.SqlColumn, PropertyInfo>();
             var props = type.GetProperties();

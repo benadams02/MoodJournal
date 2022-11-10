@@ -31,6 +31,14 @@ namespace MoodJournal
             }
         }
 
+        public SqlCommand StoredProcedure(string storedProcedure)
+        {
+            System.Data.SqlClient.SqlCommand cmd = new System.Data.SqlClient.SqlCommand(storedProcedure, this.Connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            return cmd;
+        }
+
         public bool ExecuteQuery(SqlCommand command)
         {
             if (Connection.State == System.Data.ConnectionState.Closed)
