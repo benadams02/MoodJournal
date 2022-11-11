@@ -1,5 +1,7 @@
 ﻿using System.Data;
 using System.Reflection;
+using System.Security.Claims;
+using System.Security.Principal;
 
 namespace MoodJournal
 {
@@ -9,6 +11,27 @@ namespace MoodJournal
         public User()
         { 
             
+        }
+
+        public static MoodJournal.User LoggedInUser()
+        {
+            ClaimsPrincipal thisPrincipal = (ClaimsPrincipal)(Server.HttpContext.HttpContext.User);
+            if (thisPrincipal != null)
+            {
+                var thisID = Guid.Parse(thisPrincipal.FindFirst(ClaimTypes.NameIdentifier).Value);
+                if (thisID == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    return new MoodJournal.User().Get(thisID);
+                }
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public static MoodJournal.User GetByUsername(string UserName)
