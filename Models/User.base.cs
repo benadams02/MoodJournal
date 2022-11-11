@@ -13,8 +13,9 @@ namespace MoodJournal
         [MoodJournal.Attributes.SqlColumn("LastName", true, SqlDbType.VarChar)]
         public string? LastName { get; set; }
 
+        private string _password;
         [MoodJournal.Attributes.SqlColumn("Password", true, SqlDbType.VarChar)]
-        public string? Password { get; set; }
+        public string? Password { get { return _password; } set { _password = Microsoft.AspNetCore.Identity.PasswordHasher<> } }
 
         [MoodJournal.Attributes.SqlColumn("Email", true, SqlDbType.VarChar)]
         public string? Email { get; set; }

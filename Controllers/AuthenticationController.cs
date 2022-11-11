@@ -5,6 +5,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
 
 namespace MoodJournal.Controllers
 {
@@ -37,7 +38,10 @@ namespace MoodJournal.Controllers
                 MoodJournal.User thisUser =  MoodJournal.User.GetByUsername(authreq.username);
                 if (thisUser != null)
                 {
-                    if(thisUser.UserName == authreq.username && thisUser.Password == authreq.password)
+                    PasswordHasher<ClaimsPrincipal> hasher = new PasswordHasher<ClaimsPrincipal>();
+                    var pwdCheckResult = hasher.VerifyHashedPassword(Server.HttpContext.HttpContext.User, thisUser.Password, authreq.password);
+
+                    if(thisUser.UserName == authreq.username && pwdCheckResult == PasswordVerificationResult.Success)
                     {
                         AuthenticationResponse response = new AuthenticationResponse();
                         response.username = thisUser.UserName;
