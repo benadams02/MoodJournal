@@ -26,7 +26,7 @@ builder.Services.AddAuthentication(options =>
         {
 
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("key12345key12345")),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(MoodJournal.Settings.Load().Key)),
             ValidateIssuer = false,
             ValidateAudience = false,
             ValidateLifetime = true,

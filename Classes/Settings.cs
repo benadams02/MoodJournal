@@ -9,6 +9,8 @@ namespace MoodJournal
         public string Password { get; set; }
         public string DatabaseName { get; set; }
 
+        public string Key { get; set; }
+
 
         public static Settings Load()
         {

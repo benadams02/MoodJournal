@@ -71,7 +71,7 @@ namespace MoodJournal.Controllers
                         };
 
             JwtSecurityTokenHandler jwtTokenHandler = new JwtSecurityTokenHandler();
-            var signingCreds = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes("key12345key12345")), SecurityAlgorithms.HmacSha256);
+            var signingCreds = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Server.Settings.Key)), SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(
                 claims: Claims,
                 signingCredentials: signingCreds,
