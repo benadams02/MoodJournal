@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -11,14 +12,14 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultAuthenticateScheme = "JwtBearer";
-    options.DefaultChallengeScheme = "JwtBearer";
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-    .AddJwtBearer("JwtBearer", jwtBearerOptions =>
+    .AddJwtBearer(jwtBearerOptions =>
     {
         jwtBearerOptions.SaveToken = true;
         jwtBearerOptions.RequireHttpsMetadata = false;
-        jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
+        jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters()
         {
 
             ValidateIssuerSigningKey = true,

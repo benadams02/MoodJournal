@@ -71,12 +71,12 @@ namespace MoodJournal.Controllers
                         };
 
             JwtSecurityTokenHandler jwtTokenHandler = new JwtSecurityTokenHandler();
-
+            var signingCreds = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes("key12345key12345")), SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(
-                new JwtHeader(
-                    new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes("key12345key12345")),
-                    SecurityAlgorithms.HmacSha256)),
-                    new JwtPayload(Claims));
+                claims: Claims,
+                signingCredentials: signingCreds,
+                notBefore: DateTime.Now,
+                expires: DateTime.Now.AddDays(14));
 
             var returnToken = jwtTokenHandler.WriteToken(token);
             return returnToken;
