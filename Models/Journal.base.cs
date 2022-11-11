@@ -20,5 +20,8 @@ namespace MoodJournal
 
         [MoodJournal.Attributes.SqlColumn("Mood", true, SqlDbType.VarChar)]
         public string? Mood { get; set; }
+
+        [MoodJournal.Attributes.SqlColumn("JournalContent", true, SqlDbType.VarChar)]
+        public string? JournalContent { get; set; }
     }
 }

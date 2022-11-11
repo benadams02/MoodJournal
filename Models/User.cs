@@ -13,6 +13,13 @@ namespace MoodJournal
             
         }
 
+        public MoodJournal.Journal AddJournal()
+        { 
+            MoodJournal.Journal journal = new MoodJournal.Journal(this);
+            journal.Save(true);
+            return journal;
+        }
+
         public static MoodJournal.User LoggedInUser()
         {
             ClaimsPrincipal thisPrincipal = (ClaimsPrincipal)(Server.HttpContext.HttpContext.User);

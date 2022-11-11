@@ -50,8 +50,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-var httpContext = app.Services.GetService<IHttpContextAccessor>();
 
+var httpContext = app.Services.GetService<IHttpContextAccessor>();
 MoodJournal.Server.Load(ref httpContext);
 Console.WriteLine("MoodJournal Server Loaded");
 
