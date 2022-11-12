@@ -14,5 +14,28 @@ namespace MoodJournal.Controllers
             Journal journal = MoodJournal.User.LoggedInUser().AddJournal();
             return Json(journal);
         }
+
+        [HttpPut()]
+        public ActionResult Edit([FromBody] Journal thisJournal)
+        {
+            MoodJournal.Journal dbJournal = MoodJournal.Journal.GetItem(thisJournal.ID);
+            if (dbJournal != null)
+            {
+                dbJournal.UpdateFromObject(thisJournal);
+                if (dbJournal.Save())
+                {
+                    return Ok(dbJournal);
+                }
+                else
+                {
+                    return BadRequest("Error Saving");
+                }
+            }
+            else
+            {
+                return BadRequest("Journal Not Found");
+            }
+
+        }
     }
 }
