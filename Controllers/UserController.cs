@@ -27,18 +27,18 @@ namespace MoodJournal.Controllers
             return Json(MoodJournal.User.GetAllUsers());
         }
 
-        [HttpPost("Create")]
-        public ActionResult Create()
-        {
-            MoodJournal.User user = new MoodJournal.User();
-            user.Save(true);
-            return Json(user);
-        }
+        //[HttpPost("Create")]
+        //public ActionResult Create()
+        //{
+        //    MoodJournal.User user = new MoodJournal.User();
+        //    user.Save(true);
+        //    return Json(user);
+        //}
 
         [HttpPut("{id}")]
-        public ActionResult Edit(Guid id, [FromBody] User thisUser)
+        public ActionResult Edit([FromBody] User thisUser)
         {
-            MoodJournal.User dbUser = MoodJournal.User.GetItem(id);
+            MoodJournal.User dbUser = MoodJournal.User.GetItem(thisUser.ID);
             if (dbUser != null)
             {
                 dbUser.UpdateFromObject(thisUser);

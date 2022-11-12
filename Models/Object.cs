@@ -66,10 +66,9 @@ namespace MoodJournal.Models
             Attributes.SqlTable attr = GetSqlTableAttr(thisType);
             Dictionary<Attributes.SqlColumn, PropertyInfo> SqlColumns = GetSqlProperties(thisType);
 
-            if (attr != null)
+            if (attr != null && !string.IsNullOrEmpty(attr.GetSP))
             {
-                SqlCommand cmd = new SqlCommand(attr.GetSP, Server.DataSource.Connection);
-                cmd.CommandType = CommandType.StoredProcedure;
+                SqlCommand cmd = Server.DataSource.StoredProcedure(attr.GetSP);
                 cmd.Parameters.Add(new SqlParameter("@ID", DBNull.Value));
                 System.Data.DataTable data = Server.DataSource.Read(cmd);
 
@@ -105,10 +104,9 @@ namespace MoodJournal.Models
             Type thisType = typeof(T);
             Dictionary<Attributes.SqlColumn, PropertyInfo> SqlColumns = GetSqlProperties(thisType);
 
-            if (SqlTableAttr != null)
+            if (SqlTableAttr != null && !string.IsNullOrEmpty(SqlTableAttr.GetSP))
             {
-                System.Data.SqlClient.SqlCommand cmd = new System.Data.SqlClient.SqlCommand(SqlTableAttr.GetSP, Server.DataSource.Connection);
-                cmd.CommandType = CommandType.StoredProcedure;
+                SqlCommand cmd = Server.DataSource.StoredProcedure(SqlTableAttr.GetSP);
                 cmd.Parameters.Add(new System.Data.SqlClient.SqlParameter("@ID", thisID));
                 System.Data.DataTable data = Server.DataSource.Read(cmd);
 
@@ -139,10 +137,9 @@ namespace MoodJournal.Models
 
         public bool Delete()
         {
-            if (SqlTableAttr != null)
+            if (SqlTableAttr != null && !string.IsNullOrEmpty(SqlTableAttr.DeleteSP))
             {
-                System.Data.SqlClient.SqlCommand cmd = new System.Data.SqlClient.SqlCommand(SqlTableAttr.DeleteSP, Server.DataSource.Connection);
-                cmd.CommandType = CommandType.StoredProcedure;
+                SqlCommand cmd = Server.DataSource.StoredProcedure(SqlTableAttr.DeleteSP);
                 cmd.Parameters.Add(new System.Data.SqlClient.SqlParameter("@ID", ID));
                 return Server.DataSource.ExecuteQuery(cmd);
             }
@@ -166,8 +163,7 @@ namespace MoodJournal.Models
                     query = $"{SqlTableAttr.UpdateSP}";
                 }
 
-                System.Data.SqlClient.SqlCommand cmd = new System.Data.SqlClient.SqlCommand(query, Server.DataSource.Connection);
-                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                SqlCommand cmd = Server.DataSource.StoredProcedure(query);
                 foreach (KeyValuePair<Attributes.SqlColumn, PropertyInfo> item in GetSqlProperties(typeof(T)))
                 {
                     var value = item.Value.GetValue(this);
