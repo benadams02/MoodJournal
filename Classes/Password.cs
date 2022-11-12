@@ -1,36 +1,28 @@
-﻿namespace MoodJournal.Security
+﻿using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
+
+namespace MoodJournal.Security
 {
-    public class Password : MoodJournal.Security.IPassword
+    public class Password
     {
-        IPassword _ipassword;
-
-        public Password()
+        public bool CheckPasswordsMatch(ClaimsPrincipal user, string hashedPass, string plainTextPass)
         {
-            _ipassword = this;
+            PasswordHasher<ClaimsPrincipal> hasher = new PasswordHasher<ClaimsPrincipal>();
+            var verificationResult = hasher.VerifyHashedPassword(user, hashedPass, plainTextPass);
+            if (verificationResult == PasswordVerificationResult.Failed)
+            {
+                return false;
+            }
+            else
+            { 
+                return true;
+            }
         }
 
-        public string EncryptedPassword { get; set; }
-        public string Salt { get; set; }
-        string IPassword.Password { get; set; }
-
-        public void Decrypt(string plainTextPass)
+        public string Hash(ClaimsPrincipal user, string plainTextPass)
         {
-            throw new NotImplementedException();
-        }
-
-        public void Decrypt(string plainTextPass, string Salt)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Encrypt(string plainTextPass)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Encrypt(string plainTextPass, string Salt)
-        {
-            throw new NotImplementedException();
+            PasswordHasher<ClaimsPrincipal> hasher = new PasswordHasher<ClaimsPrincipal>();
+            return hasher.HashPassword(user, plainTextPass);
         }
     }
 }
